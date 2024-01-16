@@ -1,0 +1,29 @@
+/* =========
+  Image Tabs
+  This Code is Licensed by Will-Myers.com
+========== */
+
+/* .page-section[data-mapping-status="mapping"] .user-items-list li img {
+  opacity: 0 !important;
+}
+.page-section[data-mapping-status="complete"] .user-items-list li img {
+  opacity: 1 !important;
+} */
+.list-item.store-item .list-item-content__title{
+  display:flex;
+  justify-content: space-between;
+}
+
+.page-section:has(.list-section-title) .user-items-list li img {
+  opacity: 0 !important;
+}
+.page-section:has(.list-section-title)[data-list-section-sync="initialized"] .user-items-list li img[src*="isSyncedImage=true"] {
+  opacity: 1  !important;
+}
+
+.page-section .list-section-title  {
+  display: none;
+}
+.page-section[data-list-section-sync="initialized"] .list-section-title  {
+  display: block;
+}
