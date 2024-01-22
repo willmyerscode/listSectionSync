@@ -1,9 +1,7 @@
 /**
-* Testing
 * List Section Sync
 * Copyright Will-Myers.com
 */
-
 
 class SummaryListSections{
   constructor(section) {
