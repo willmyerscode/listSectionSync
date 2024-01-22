@@ -25,9 +25,17 @@ class SummaryListSections{
       console.error('Not Enough Collection Items')
       return;
     }
+    this.templatizeListItems();
     this.mapCollectionDataToListItems(); 
     this.addLoadEventListeners();
     this.section.dataset.listSectionSync = 'initialized';
+  }
+
+  adjustTitle() {
+    let url = this.titleStr.match(/\{sync=(.*?)\}/)[0];
+    let newTitleHTML = this.titleEl.innerHTML.replaceAll(url, '');
+    this.titleEl.innerHTML = newTitleHTML;
+    if (this.titleEl.innerText.trim() == '') this.titleEl.style.display = 'none';
   }
 
   async getCollectionData() {
@@ -49,15 +57,14 @@ class SummaryListSections{
     }
   }
 
-  adjustTitle() {
-    let url = this.titleStr.match(/\{sync=(.*?)\}/)[0];
-    let newTitleHTML = this.titleEl.innerHTML.replaceAll(url, '');
-    this.titleEl.innerHTML = newTitleHTML;
-    if (this.titleEl.innerText.trim() == '') this.titleEl.style.display = 'none';
+  templatizeListItems() {
+    const templateHTML = this.sectionItems[0].innerHTML;
+    this.sectionItems.forEach(el => el.innerHTML = templateHTML);
   }
 
   mapCollectionDataToListItems() {
     const currentContext = this.currentContext;
+    let buttonText = this.sectionItems[0].querySelector('a.list-item-content__button').innerHTML;
     for (let [index, listItem] of this.sectionItems.entries()) {
       const contextItem = this.currentContext.userItems[index];
       const { 
@@ -71,6 +78,8 @@ class SummaryListSections{
         recordTypeLabel,
         passthrough
       } = this.collectionData[index];
+
+      const realUrl = passthrough ? sourceUrl : fullUrl;
       
       let newAssetUrl = new URL(assetUrl)
       let params = new URLSearchParams(newAssetUrl.search);
@@ -86,9 +95,9 @@ class SummaryListSections{
         if (variants) {
           let price = variants[0].priceMoney.value;
           let currency = this.currencySignConverter(variants[0].priceMoney.currency);
-          titleEl.innerHTML = `<span>${title}</span><span class="price">${currency}${price}</span>`;
+          titleEl.innerHTML = `<a href="${realUrl}">${title}</a><span class="price">${currency}${price}</span>`;
         } else {
-          titleEl.innerText = title;
+          titleEl.innerHTML = `<a href="${realUrl}">${title}</a>`;
         }
       }
       if (descriptionEl) {
@@ -96,30 +105,33 @@ class SummaryListSections{
       }
       if (thumbnailEl) {
         let cloneThumbnail = thumbnailEl.cloneNode(true);
+        const imageLink = document.createElement('a');
+        const hasImageLink = thumbnailEl.querySelector('.image-link');
+        imageLink.href = realUrl;
+        imageLink.classList.add('image-link')
         cloneThumbnail.src = newAssetUrl;
         cloneThumbnail.dataset.src = newAssetUrl;
         cloneThumbnail.dataset.image = newAssetUrl;
         thumbnailEl.parentElement.append(cloneThumbnail)
+        if (!hasImageLink) thumbnailEl.parentElement.append(imageLink)
         thumbnailEl.style.display = 'none'
       }
       if (buttonEl) {
-        buttonEl.setAttribute('href', fullUrl)
+        buttonEl.setAttribute('href', realUrl)
+        buttonEl.innerHTML = buttonText;
       }
-      
     }
+
     const updatedDataStr = JSON.stringify(this.currentContext);
     this.listSectionContainer.dataset.currentContext = updatedDataStr;
-    
   }
 
   addLoadEventListeners() {
     window.addEventListener('DOMContentLoaded', () => {
       this.mapCollectionDataToListItems(); 
-      console.log('DOMContentLoaded')
     })
     window.addEventListener('load', () => {
       this.mapCollectionDataToListItems(); 
-      console.log('load')
       //this.section.dataset.listSectionSync = 'initialized';
     })
   }
