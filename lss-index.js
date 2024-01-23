@@ -64,7 +64,6 @@ class SummaryListSections{
 
   mapCollectionDataToListItems() {
     const currentContext = this.currentContext;
-    let buttonText = this.sectionItems[0].querySelector('a.list-item-content__button').innerHTML;
     for (let [index, listItem] of this.sectionItems.entries()) {
       const contextItem = this.currentContext.userItems[index];
       const { 
@@ -169,7 +168,7 @@ const WMSummaryListSectionTitles = document.querySelectorAll('.list-section-titl
 for (let el of WMSummaryListSectionTitles) {
   const section = el.closest('.page-section');
   const text = el.innerText;
-  
+   
   if (text.includes("{") && text.includes("}")) {
     section.WMSummaryList = new SummaryListSections(section)
   } else {
