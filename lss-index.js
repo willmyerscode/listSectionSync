@@ -4,8 +4,9 @@
 */
 
 class SummaryListSections{
-  constructor(section) {
-    this.section = section;
+  constructor(settings) {
+    this.settings = settings;
+    this.section = this.settings.section;
     this.titleEl = this.section.querySelector('.list-section-title');
     this.titleStr = this.titleEl.innerText.toLowerCase();
     this.collectionUrl = this.titleStr.match(/\{sync=(.*?)\}/)[1];
@@ -63,9 +64,9 @@ class SummaryListSections{
   }
 
   mapCollectionDataToListItems() {
-    const currentContext = this.currentContext;
-    for (let [index, listItem] of this.sectionItems.entries()) {
-      const contextItem = this.currentContext.userItems[index];
+    const currentContext = this.currentContext; 
+    for (let [index, listItem] of this.sectionItems.entries()) { 
+      const contextItem = this.currentContext.userItems[index]; 
       const { 
         title, 
         assetUrl, 
@@ -94,9 +95,17 @@ class SummaryListSections{
         if (variants) {
           let price = variants[0].priceMoney.value;
           let currency = this.currencySignConverter(variants[0].priceMoney.currency);
-          titleEl.innerHTML = `<a href="${realUrl}">${title}</a><span class="price">${currency}${price}</span>`;
+          if (this.settings.titleLink) {
+            titleEl.innerHTML = `<a href="${realUrl}">${title}</a><span class="price">${currency}${price}</span>`;
+          } else {
+            titleEl.innerHTML = `<span>${title}</span><span class="price">${currency}${price}</span>`;
+          }
         } else {
-          titleEl.innerHTML = `<a href="${realUrl}">${title}</a>`;
+          if  (this.settings.titleLink) {
+            titleEl.innerHTML = `<a href="${realUrl}">${title}</a>`;
+          } else {
+            titleEl.innerHTML = `<span">${title}</span>`;
+          }
         }
       }
       if (descriptionEl) {
@@ -104,20 +113,23 @@ class SummaryListSections{
       }
       if (thumbnailEl) {
         let cloneThumbnail = thumbnailEl.cloneNode(true);
-        const imageLink = document.createElement('a');
         const hasImageLink = thumbnailEl.querySelector('.image-link');
-        imageLink.href = realUrl;
-        imageLink.classList.add('image-link')
         cloneThumbnail.src = newAssetUrl;
         cloneThumbnail.dataset.src = newAssetUrl;
         cloneThumbnail.dataset.image = newAssetUrl;
         thumbnailEl.parentElement.append(cloneThumbnail)
-        if (!hasImageLink) thumbnailEl.parentElement.append(imageLink)
+        if (!hasImageLink && this.settings.imageLink) {
+          const imageLink = document.createElement('a');
+          imageLink.href = realUrl;
+          imageLink.classList.add('image-link')
+          thumbnailEl.parentElement.append(imageLink)
+        }
         thumbnailEl.style.display = 'none'
       }
       if (buttonEl) {
         buttonEl.setAttribute('href', realUrl)
-        buttonEl.innerHTML = buttonText;
+        const btnHTML = this.sectionItems[0].querySelector('a.list-item-content__button').innerHTML;
+        buttonEl.innerHTML = btnHTML;
       }
     }
 
@@ -131,7 +143,6 @@ class SummaryListSections{
     })
     window.addEventListener('load', () => {
       this.mapCollectionDataToListItems(); 
-      //this.section.dataset.listSectionSync = 'initialized';
     })
   }
 
@@ -168,9 +179,14 @@ const WMSummaryListSectionTitles = document.querySelectorAll('.list-section-titl
 for (let el of WMSummaryListSectionTitles) {
   const section = el.closest('.page-section');
   const text = el.innerText;
+  const settings = {
+    section: section,
+    imageLink: false,
+    titleLink: true
+  };
    
   if (text.includes("{") && text.includes("}")) {
-    section.WMSummaryList = new SummaryListSections(section)
+    section.WMSummaryList = new SummaryListSections(settings)
   } else {
     section.dataset.listSectionSync = "initialized";
   }
