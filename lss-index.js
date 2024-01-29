@@ -188,6 +188,6 @@ for (let el of WMSummaryListSectionTitles) {
   if (text.includes("{") && text.includes("}")) {
     section.WMSummaryList = new SummaryListSections(settings)
   } else {
-    section.dataset.listSectionSync = "initialized";
+    section.dataset.listSectionSync = "false";
   }
 }
