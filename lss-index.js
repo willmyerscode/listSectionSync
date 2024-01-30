@@ -64,7 +64,7 @@ class SummaryListSections{
   }
 
   mapCollectionDataToListItems() {
-    const currentContext = this.currentContext; 
+    
     for (let [index, listItem] of this.sectionItems.entries()) { 
       const contextItem = this.currentContext.userItems[index]; 
       const { 
@@ -117,6 +117,7 @@ class SummaryListSections{
         cloneThumbnail.src = newAssetUrl;
         cloneThumbnail.dataset.src = newAssetUrl;
         cloneThumbnail.dataset.image = newAssetUrl;
+        cloneThumbnail.srcset = '';
         thumbnailEl.parentElement.append(cloneThumbnail)
         if (!hasImageLink && this.settings.imageLink) {
           const imageLink = document.createElement('a');
@@ -132,9 +133,6 @@ class SummaryListSections{
         buttonEl.innerHTML = btnHTML;
       }
     }
-
-    const updatedDataStr = JSON.stringify(this.currentContext);
-    this.listSectionContainer.dataset.currentContext = updatedDataStr;
   }
 
   addLoadEventListeners() {
