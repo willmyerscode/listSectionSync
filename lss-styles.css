@@ -20,7 +20,7 @@ body:not(.sqs-edit-mode-active) .page-section:has(.list-section-title)[data-list
 
 body:not(.sqs-edit-mode-active) .page-section .list-section-title  {
   display: none;
-}asdf
+}
 body:not(.sqs-edit-mode-active) .page-section[data-list-section-sync="initialized"] .list-section-title,
 body:not(.sqs-edit-mode-active) .page-section[data-list-section-sync="false"] .list-section-title{
   display: block;
