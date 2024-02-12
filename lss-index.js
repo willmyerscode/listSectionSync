@@ -8,9 +8,10 @@ class SummaryListSections{
     this.settings = settings;
     this.section = this.settings.section;
     this.titleEl = this.section.querySelector('.list-section-title');
-    this.titleStr = this.titleEl.innerText.toLowerCase();
+    this.titleStr = this.titleEl.innerText;
     this.collectionUrl = this.titleStr.match(/\{sync=(.*?)\}/)[1];
     this.collectionData = [];
+    this.filterForFeatured = false;
     this.sectionItems = this.section.querySelectorAll('li.list-item');
     this.listSectionContainer = this.section.querySelector('.user-items-list-item-container')
     this.currentContext = JSON.parse(this.listSectionContainer.dataset.currentContext);
@@ -41,15 +42,31 @@ class SummaryListSections{
 
   async getCollectionData() {
     try {
-      const date = new Date().getTime();
-      const response =  await fetch(`${this.collectionUrl}?format=json&date=${date}`);
+      const url = new URL(this.collectionUrl, window.location.origin); // Create a URL object from the collection URL
+      const params = new URLSearchParams(url.search);// Use URLSearchParams for query parameters
+      if (params.has('featured')) { 
+        this.filterForFeatured = true; // Check and log the parameters (if 'size' exists and 'featured' is present)
+        params.delete('featured')
+      }
+      
+      const date = new Date().getTime(); // Adding a cache busting parameter
+      params.set('format', 'json');
+      params.set('date', date);
+      url.search = params.toString(); // Update the search part of the URL
+
+      // Make the fetch request using the updated URL
+      const response = await fetch(url.toString());
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status}`);
       }
       const data = await response.json();
-      const items = data.items;
+      let items = data.items;
       if (!items) {
         throw new Error(`No items in the collection`);
+      }
+      if (this.filterForFeatured) {
+        console.log('filtering')
+        items = items.filter(item => item.starred === true);
       }
       return items; // Return the data so it can be used after await
     } catch (error) {
