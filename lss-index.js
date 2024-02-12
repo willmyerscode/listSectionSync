@@ -24,8 +24,11 @@ class SummaryListSections{
     this.adjustTitle();
     
     if (this.sectionItems.length > this.collectionData.length) {
-      console.error('Not Enough Collection Items')
-      return;
+      console.error('Not Enough Collection Items, trimming List Section List');
+      while (this.sectionItems.length > this.collectionData.length) {
+        this.sectionItems[this.sectionItems.length - 1].remove(); // Remove the last item
+        this.sectionItems = this.section.querySelectorAll('li.list-item'); // Update the NodeList
+      }
     }
     this.templatizeListItems();
     this.mapCollectionDataToListItems(); 
@@ -150,6 +153,7 @@ class SummaryListSections{
         buttonEl.innerHTML = btnHTML;
       }
     }
+    window.dispatchEvent(new Event('resize'))
   }
 
   addLoadEventListeners() {
