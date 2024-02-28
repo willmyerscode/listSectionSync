@@ -46,3 +46,39 @@ body.sqs-edit-mode .list-section-title .wm-error {
   width: 100%;
   height: 100%;
 }
+
+
+/*Global Animation Resets*/
+[data-list-section-sync="initialized"] .preFade {
+  opacity: 1;
+}
+[data-list-section-sync="initialized"] .preScale {
+  opacity: 1;
+  transform: scale(1);
+}
+[data-list-section-sync="initialized"] .preSlide {
+  opacity: 1;
+  transform: initial;
+}
+[data-list-section-sync="initialized"] .preClip {
+  opacity: 1;
+  transform: translateZ(0);
+  clip-path: initial;
+  -webkit-clip-path: initial;
+}
+
+/*Flex*/
+[data-list-section-sync="initialized"] li .preFlex {
+  opacity: 1;
+  transform: initial;
+  clip-path: initial;
+  -webkit-clip-path: initial;
+}
+[data-list-section-sync="initialized"] li [data-animation-role="image"].preFlex {
+  transform: initial;
+  clip-path: initial;
+  -webkit-clip-path: initial;
+}
+[data-list-section-sync="initialized"] li .animation-segment-parent-hidden {
+  opacity: 1;
+}
