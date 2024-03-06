@@ -24,7 +24,7 @@ class SummaryListSections{
     this.adjustTitle();
     
     if (this.sectionItems.length > this.collectionData.length) {
-      console.error('Not Enough Collection Items, trimming List Section List');
+      console.warning('Will-Myers List Sync: Not Enough Collection Items, trimming List Section List');
       while (this.sectionItems.length > this.collectionData.length) {
         this.sectionItems[this.sectionItems.length - 1].remove(); // Remove the last item
         this.sectionItems = this.section.querySelectorAll('li.list-item'); // Update the NodeList
@@ -43,9 +43,9 @@ class SummaryListSections{
     if (this.titleEl.innerText.trim() == '') this.titleEl.style.display = 'none';
   }
 
-  async getCollectionData() {
+  async getCollectionData(path = this.collectionUrl, itemsArray = []) {
     try {
-      const url = new URL(this.collectionUrl, window.location.origin); // Create a URL object from the collection URL
+      const url = new URL(path, window.location.origin); // Create a URL object from the collection URL
       const params = new URLSearchParams(url.search);// Use URLSearchParams for query parameters
       if (params.has('featured')) { 
         this.filterForFeatured = true; // Check and log the parameters (if 'size' exists and 'featured' is present)
@@ -68,10 +68,18 @@ class SummaryListSections{
         throw new Error(`No items in the collection`);
       }
       if (this.filterForFeatured) {
-        console.log('filtering')
         items = items.filter(item => item.starred === true);
       }
-      return items; // Return the data so it can be used after await
+      items.forEach(item => itemsArray.push(item))
+      if (itemsArray.length >= this.sectionItems.length) {
+        return itemsArray;
+      }
+      if (data.pagination && data.pagination.nextPageUrl && data.pagination.nextPage) {
+        console.log('getting next set: ', itemsArray)
+        return await this.getCollectionData(data.pagination.nextPageUrl, itemsArray)
+      } else {
+        return itemsArray;
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       throw error;
