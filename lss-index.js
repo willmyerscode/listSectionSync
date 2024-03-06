@@ -209,4 +209,4 @@ for (let el of WMSummaryListSectionTitles) {
   } else {
     section.dataset.listSectionSync = "false";
   }
-}
+};
