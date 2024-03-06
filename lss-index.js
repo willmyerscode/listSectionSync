@@ -192,7 +192,7 @@ class SummaryListSections{
 
     return currencyMap[currencyCode] || 'Unknown Currency';
   }
-}
+};
 
 const WMSummaryListSectionTitles = document.querySelectorAll('.list-section-title');
 for (let el of WMSummaryListSectionTitles) {
