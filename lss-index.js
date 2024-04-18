@@ -13,7 +13,7 @@ class SummaryListSections{
     this.collectionData = [];
     this.filterForFeatured = false;
     this.sectionItems = this.section.querySelectorAll('li.list-item');
-    this.listSectionContainer = this.section.querySelector('.user-items-list-item-container')
+    this.listSectionContainer = this.section.querySelector('.user-items-list-item-container');
     this.currentContext = JSON.parse(this.listSectionContainer.dataset.currentContext);
 
     this.init();
@@ -26,8 +26,8 @@ class SummaryListSections{
     if (this.sectionItems.length > this.collectionData.length) {
       console.warn('Will-Myers List Sync: Not Enough Collection Items, trimming List Section List');
       while (this.sectionItems.length > this.collectionData.length) {
-        this.sectionItems[this.sectionItems.length - 1].remove(); // Remove the last item
-        this.sectionItems = this.section.querySelectorAll('li.list-item'); // Update the NodeList
+        this.sectionItems[this.sectionItems.length - 1].remove(); 
+        this.sectionItems = this.section.querySelectorAll('li.list-item'); 
       }
     }
     this.templatizeListItems();
@@ -51,6 +51,11 @@ class SummaryListSections{
         this.filterForFeatured = true; // Check and log the parameters (if 'size' exists and 'featured' is present)
         params.delete('featured')
       }
+      let events = 'upcoming';
+      if (params.has('events')) {
+        events = params.get('events');
+        params.delete('events')
+      }
       
       const date = new Date().getTime(); // Adding a cache busting parameter
       params.set('format', 'json');
@@ -69,7 +74,9 @@ class SummaryListSections{
         if (!data.upcoming && !data.past){
           throw new Error(`No items in the collection`);
         } else {
-          items = [...data.past, ...data.upcoming];
+          items = data.upcoming
+          if (events === 'past') items = data.past;
+          if (events === 'both') items = [...data.upcoming, ...data.past];
         }
       }
       if (this.filterForFeatured) {
@@ -104,6 +111,8 @@ class SummaryListSections{
         assetUrl, 
         body, 
         excerpt, 
+        startDate,
+        endDate,
         fullUrl, 
         sourceUrl, 
         variants,
@@ -156,6 +165,23 @@ class SummaryListSections{
           imageLink.href = realUrl;
           imageLink.classList.add('image-link')
           thumbnailEl.parentElement.append(imageLink)
+        }
+        if (recordTypeLabel === 'event') {
+          const dateTag = document.createElement('div');
+          const dateStart = new Date(startDate);
+          const dateEnd = new Date(endDate);
+          const startDateMonth = dateStart.toLocaleDateString('en-US', { month: 'short' });
+          const startDateDay = dateStart.getDate()
+          const endDateMonth = dateEnd.toLocaleDateString('en-US', { month: 'short' });
+          const endDateDay = dateEnd.getDate()
+          dateTag.classList.add('eventlist-datetag')
+          dateTag.innerHTML = `<div class="eventlist-datetag-inner">
+            <div class="eventlist-datetag-startdate eventlist-datetag-startdate--month">${startDateMonth}</div>
+            <div class="eventlist-datetag-startdate eventlist-datetag-startdate--day">${startDateDay}</div>
+            <div class="eventlist-datetag-enddate">to ${endDateMonth} ${endDateDay}</div>
+            <div class="eventlist-datetag-status"></div>
+          </div>`;
+          thumbnailEl.parentElement.append(dateTag)
         }
         thumbnailEl.style.display = 'none'
       }
@@ -222,4 +248,3 @@ for (let el of WMSummaryListSectionTitles) {
     section.dataset.listSectionSync = "false";
   }
 };
-
