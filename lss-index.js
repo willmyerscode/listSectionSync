@@ -24,7 +24,7 @@ class SummaryListSections{
     this.adjustTitle();
     
     if (this.sectionItems.length > this.collectionData.length) {
-      console.warning('Will-Myers List Sync: Not Enough Collection Items, trimming List Section List');
+      console.warn('Will-Myers List Sync: Not Enough Collection Items, trimming List Section List');
       while (this.sectionItems.length > this.collectionData.length) {
         this.sectionItems[this.sectionItems.length - 1].remove(); // Remove the last item
         this.sectionItems = this.section.querySelectorAll('li.list-item'); // Update the NodeList
@@ -56,6 +56,7 @@ class SummaryListSections{
       params.set('format', 'json');
       params.set('date', date);
       url.search = params.toString(); // Update the search part of the URL
+      
 
       // Make the fetch request using the updated URL
       const response = await fetch(url.toString());
@@ -65,7 +66,11 @@ class SummaryListSections{
       const data = await response.json();
       let items = data.items;
       if (!items) {
-        throw new Error(`No items in the collection`);
+        if (!data.upcoming && !data.past){
+          throw new Error(`No items in the collection`);
+        } else {
+          items = [...data.past, ...data.upcoming];
+        }
       }
       if (this.filterForFeatured) {
         items = items.filter(item => item.starred === true);
@@ -75,7 +80,6 @@ class SummaryListSections{
         return itemsArray;
       }
       if (data.pagination && data.pagination.nextPageUrl && data.pagination.nextPage) {
-        console.log('getting next set: ', itemsArray)
         return await this.getCollectionData(data.pagination.nextPageUrl, itemsArray)
       } else {
         return itemsArray;
@@ -218,3 +222,4 @@ for (let el of WMSummaryListSectionTitles) {
     section.dataset.listSectionSync = "false";
   }
 };
+
