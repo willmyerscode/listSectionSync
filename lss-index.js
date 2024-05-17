@@ -232,19 +232,29 @@ class SummaryListSections{
   }
 };
 
-const WMSummaryListSectionTitles = document.querySelectorAll('.list-section-title');
-for (let el of WMSummaryListSectionTitles) {
-  const section = el.closest('.page-section');
-  const text = el.innerText;
-  const settings = {
-    section: section,
-    imageLink: false,
-    titleLink: true
-  };
-   
-  if (text.includes("{") && text.includes("}")) {
-    section.WMSummaryList = new SummaryListSections(settings)
-  } else {
-    section.dataset.listSectionSync = "false";
+(function() {
+  const init = () => {
+    const WMSummaryListSectionTitles = document.querySelectorAll('.list-section-title');
+    for (let el of WMSummaryListSectionTitles) {
+      const section = el.closest('.page-section');
+      if (section.dataset.listSectionSync) continue;
+      const text = el.innerText;
+      const settings = {
+        section: section,
+        imageLink: false,
+        titleLink: true
+      };
+       
+      if (text.includes("{") && text.includes("}")) {
+        section.WMSummaryList = new SummaryListSections(settings)
+      } else {
+        section.dataset.listSectionSync = "false";
+      }
+    };
   }
-};
+  
+  window.wmListSectionSync = {
+    init: init
+  }
+  init();
+}());
