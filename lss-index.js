@@ -134,12 +134,22 @@ class SummaryListSections{
       listItem.classList.add(recordTypeLabel);
       if (titleEl) {
         if (variants) {
+          let onSale = variants[0].onSale;
+          let salePrice = variants[0].salePriceMoney.value;
           let price = variants[0].priceMoney.value;
           let currency = this.currencySignConverter(variants[0].priceMoney.currency);
           if (this.settings.titleLink) {
-            titleEl.innerHTML = `<a href="${realUrl}">${title}</a><span class="price">${currency}${price}</span>`;
+            if (onSale) {
+              titleEl.innerHTML = `<a href="${realUrl}">${title}</a> <span><span class="price">${currency}${salePrice}</span><span class="price" style="text-decoration: line-through; margin-left: 5px;">${currency}${price}</span></span>`;
+            } else {
+              titleEl.innerHTML = `<a href="${realUrl}">${title}</a> <span class="price">${currency}${price}</span>`;
+            }
           } else {
-            titleEl.innerHTML = `<span>${title}</span><span class="price">${currency}${price}</span>`;
+            if (onSale) {
+              titleEl.innerHTML = `<span>${title}</span> <span><span class="price">${currency}${salePrice}</span><span class="price" style="text-decoration: line-through;">${currency}${price}</span></span>`;
+            } else {
+              titleEl.innerHTML = `<span>${title}</span> <span class="price">${currency}${price}</span>`;
+            }
           }
         } else {
           if  (this.settings.titleLink) {
