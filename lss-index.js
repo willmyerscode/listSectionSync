@@ -34,6 +34,35 @@ class SummaryListSections{
     this.mapCollectionDataToListItems(); 
     this.addLoadEventListeners();
     this.section.dataset.listSectionSync = 'initialized';
+    
+    // Create mutation observer to watch for controller binding
+    const controllerElement = this.section.querySelector("[data-controller]");
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.attributeName === "data-controllers-bound") {
+          if (
+            controllerElement.dataset.controllersBound ===
+            "UserItemsListCarousel"
+          ) {
+            controllerElement.removeAttribute("data-controller");
+            observer.disconnect();
+          }
+        }
+      });
+    });
+
+    if (
+      controllerElement &&
+      controllerElement.dataset.controllersBound === "UserItemsListCarousel"
+    ) {
+      controllerElement.removeAttribute("data-controller");
+    } else if (controllerElement) {
+      // Start observing the element for attribute changes
+      observer.observe(controllerElement, {
+        attributes: true,
+        attributeFilter: ["data-controllers-bound"],
+      });
+    }
   }
 
   adjustTitle() {
@@ -204,12 +233,14 @@ class SummaryListSections{
     window.dispatchEvent(new Event('resize'))
   }
 
+
+
   addLoadEventListeners() {
     window.addEventListener('DOMContentLoaded', () => {
       this.mapCollectionDataToListItems(); 
     })
     window.addEventListener('load', () => {
-      this.mapCollectionDataToListItems(); 
+      this.mapCollectionDataToListItems();
     })
   }
 
@@ -256,7 +287,7 @@ class SummaryListSections{
       };
        
       if (text.includes("{") && text.includes("}")) {
-        section.WMSummaryList = new SummaryListSections(settings)
+        section.WMSummaryList = new SummaryListSections(settings);
       } else {
         section.dataset.listSectionSync = "false";
       }
