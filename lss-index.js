@@ -7,6 +7,7 @@ class SummaryListSections{
   constructor(settings) {
     this.settings = settings;
     this.section = this.settings.section;
+    this.section.dataset.listSectionSync = 'loading'
     this.titleEl = this.section.querySelector('.list-section-title');
     this.titleStr = this.titleEl.innerText;
     this.collectionUrl = this.titleStr.match(/\{sync=(.*?)\}/)[1];
