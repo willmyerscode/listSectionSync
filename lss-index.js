@@ -136,6 +136,7 @@ class SummaryListSections{
     
     for (let [index, listItem] of this.sectionItems.entries()) { 
       const contextItem = this.currentContext.userItems[index]; 
+      const collectionItem = this.collectionData[index];
       const { 
         title, 
         assetUrl, 
@@ -148,7 +149,10 @@ class SummaryListSections{
         variants,
         recordTypeLabel,
         passthrough
-      } = this.collectionData[index];
+      } = collectionItem;
+
+      const pricing = variants?.[0] ?? collectionItem;
+      const hasPrice = pricing?.priceMoney?.value != null && pricing.priceMoney.currency;
 
       const realUrl = passthrough ? sourceUrl : fullUrl;
       
@@ -163,11 +167,11 @@ class SummaryListSections{
       let buttonEl = listItem.querySelector('a.list-item-content__button');
       listItem.classList.add(recordTypeLabel);
       if (titleEl) {
-        if (variants) {
-          let onSale = variants[0].onSale;
-          let salePrice = variants[0].salePriceMoney.value;
-          let price = variants[0].priceMoney.value;
-          let currency = this.currencySignConverter(variants[0].priceMoney.currency);
+        if (hasPrice) {
+          let onSale = pricing.onSale && pricing.salePriceMoney?.value != null;
+          let salePrice = pricing.salePriceMoney?.value;
+          let price = pricing.priceMoney.value;
+          let currency = this.currencySignConverter(pricing.priceMoney.currency);
           if (this.settings.titleLink) {
             if (onSale) {
               titleEl.innerHTML = `<a href="${realUrl}">${title}</a> <span><span class="price">${currency}${salePrice}</span><span class="price" style="text-decoration: line-through; margin-left: 5px;">${currency}${price}</span></span>`;
